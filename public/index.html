@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f8fc" />
+    <title>PayFlow Copilot — AI-assisted checkout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="PayFlow Copilot home"><span class="brand-mark">P</span><span>PayFlow <b>Copilot</b></span></a>
+      <div class="sandbox-pill"><span></span> Sandbox demo</div>
+    </header>
+
+    <main class="layout">
+      <section class="intro">
+        <p class="eyebrow">PAYMENT ASSISTANT FOR SMALL SELLERS</p>
+        <h1>From order message<br />to <span>payment-ready.</span></h1>
+        <p class="lede">Describe an order naturally. AI drafts the details for your review, then PayPal Sandbox handles the test checkout.</p>
+        <div class="steps" aria-label="How it works">
+          <div class="step active"><span>1</span><div><b>Describe</b><small>Write an order</small></div></div>
+          <i></i>
+          <div class="step"><span>2</span><div><b>Review</b><small>Check AI details</small></div></div>
+          <i></i>
+          <div class="step"><span>3</span><div><b>Checkout</b><small>Test with PayPal</small></div></div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="order-title">
+        <div class="card-heading">
+          <div><p class="eyebrow">NEW PAYMENT</p><h2 id="order-title">Create an order</h2></div>
+          <div class="sparkle" aria-hidden="true">✳</div>
+        </div>
+
+        <form id="order-form">
+          <label for="order-text">What did the customer order?</label>
+          <textarea id="order-text" rows="3" minlength="5" maxlength="500" placeholder="Example: 2 handmade candles at $18.50 each for Priya" required></textarea>
+          <div class="field-note"><span>Include the item, quantity, and price.</span><span id="char-count">0 / 500</span></div>
+          <button id="parse-button" class="primary-button" type="submit"><span class="button-sparkle">✳</span> Draft order with AI <span aria-hidden="true">→</span></button>
+        </form>
+
+        <p id="message" class="message" role="status" aria-live="polite"></p>
+
+        <section id="review-panel" class="review-panel" hidden aria-labelledby="review-title">
+          <div class="review-title-row"><div><p class="eyebrow">AI DRAFT · PLEASE VERIFY</p><h3 id="review-title">Review before payment</h3></div><span class="review-check">✓</span></div>
+          <div class="review-grid">
+            <label>Item<input id="item" maxlength="100" required /></label>
+            <label>Quantity<input id="quantity" type="number" min="1" max="1000" step="1" required /></label>
+            <label>Unit price (USD)<div class="money-input"><span>$</span><input id="unit-price" type="number" min="0.01" max="100000" step="any" required /></div></label>
+            <label>Customer name <small>(optional)</small><input id="customer-name" maxlength="100" /></label>
+          </div>
+          <div class="total-row"><span>Sandbox total</span><strong id="total">$0.00</strong></div>
+          <p class="human-control">You approve and edit the draft before any PayPal order is created.</p>
+          <div id="paypal-button-container"></div>
+        </section>
+
+        <div class="card-foot"><span class="lock">◈</span> Test payments only. No real money moves.</div>
+      </section>
+
+      <section id="success-panel" class="success-panel" hidden>
+        <span class="success-icon">✓</span><div><b>Sandbox payment complete</b><p id="success-detail">The test transaction was captured successfully.</p></div>
+      </section>
+    </main>
+    <footer>Built for the PayPal AI Hackathon · Sandbox transactions only</footer>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
