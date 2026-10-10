@@ -43,7 +43,7 @@ The smoke tests check the entry page, required input, and missing-AI-key behavio
 flowchart TD
   Seller -->|enters order| Page["Order page<br/>public/index.html"]
   Page -->|hosts workflow| Browser["Browser workflow<br/>public/app.js"]
-  Browser -->|calculates displayed total| Money["Total calculation<br/>public/money.js"]
+  Browser -->|calculates USD total| Money["Total calculation<br/>public/money.js"]
 
   subgraph Backend["Routes in one Node.js backend · server.mjs"]
     Parse["Order parsing route<br/>POST /api/parse-order"]
