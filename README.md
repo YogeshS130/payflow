@@ -45,11 +45,11 @@ flowchart TD
   Page -->|hosts workflow| Browser["Browser workflow<br/>public/app.js"]
   Browser -->|calculates displayed total| Money["Total calculation<br/>public/money.js"]
 
-  subgraph Backend["Single Node.js backend · server.mjs"]
-    Parse["POST /api/parse-order"]
-    Config["GET /api/config"]
-    Create["POST /api/orders"]
-    Capture["POST /api/orders/:orderId/capture"]
+  subgraph Backend["Routes in one Node.js backend · server.mjs"]
+    Parse["Order parsing route<br/>POST /api/parse-order"]
+    Config["PayPal config route<br/>GET /api/config"]
+    Create["Order creation route<br/>POST /api/orders"]
+    Capture["Payment capture route<br/>POST /api/orders/:orderId/capture"]
   end
 
   Browser -->|draft request| Parse
