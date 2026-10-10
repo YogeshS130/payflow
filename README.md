@@ -39,8 +39,41 @@ The smoke tests check the entry page, required input, and missing-AI-key behavio
 
 ## Architecture
 
-- `public/` — browser interface and PayPal JavaScript SDK button.
-- `server.mjs` — Gemini parsing (one retry and a Gemini 2.5 Flash fallback on HTTP 503), PayPal Orders v2 creation/capture, and secret handling.
+```mermaid
+flowchart TD
+  Seller -->|enters order| Page["Order page<br/>public/index.html"]
+  Page -->|hosts workflow| Browser["Browser workflow<br/>public/app.js"]
+  Browser -->|calculates displayed total| Money["Total calculation<br/>public/money.js"]
+
+  subgraph Backend["Single Node.js backend · server.mjs"]
+    Parse["POST /api/parse-order"]
+    Config["GET /api/config"]
+    Create["POST /api/orders"]
+    Capture["POST /api/orders/:orderId/capture"]
+  end
+
+  Browser -->|draft request| Parse
+  Parse -->|requests structured draft| Gemini["Gemini API"]
+  Gemini -->|draft details| Parse
+  Parse -->|reviewable draft| Browser
+
+  Browser -->|fetches browser client ID| Config
+  Config -->|client ID| Browser
+  Browser -->|loads and renders| SDK["PayPal JavaScript SDK"]
+  SDK -->|seller approves checkout| Browser
+  Browser -->|creates order| Create
+  Create -->|creates Sandbox order| Orders["PayPal Orders API · Sandbox"]
+  Orders -->|order ID| Create
+  Create -->|order ID| Browser
+  Browser -->|requests capture| Capture
+  Capture -->|captures payment| Orders
+  Orders -->|payment status| Capture
+  Capture -->|capture result| Browser
+```
+
+- `public/` — browser interface, displayed USD total calculation, and PayPal JavaScript SDK button.
+- `server.mjs` — one Node.js backend serving the UI and handling Gemini parsing, PayPal Orders v2 creation/capture, and server-side credentials.
+- `public/money.js` — decimal-to-cents conversion and rounding for the USD total; it does not convert between currencies.
 - `tests/` — Playwright smoke tests.
 
 ## Hackathon status
