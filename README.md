@@ -61,11 +61,11 @@ flowchart TD
   Config -->|client ID| Browser
   Browser -->|loads and renders| SDK["PayPal JavaScript SDK"]
   SDK -->|seller approves checkout| Browser
-  Browser -->|creates order| Create
+  Browser -->|create| Create
   Create -->|creates Sandbox order| Orders["PayPal Orders API · Sandbox"]
   Orders -->|order ID| Create
   Create -->|order ID| Browser
-  Browser -->|requests capture| Capture
+  Browser -->|capture| Capture
   Capture -->|captures payment| Orders
   Orders -->|payment status| Capture
   Capture -->|capture result| Browser
