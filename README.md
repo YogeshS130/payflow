@@ -43,7 +43,7 @@ The smoke tests check the entry page, required input, and missing-AI-key behavio
 flowchart TD
   Seller -->|enters order| Page["Order page<br/>public/index.html"]
   Page -->|hosts workflow| Browser["Browser workflow<br/>public/app.js"]
-  Browser -->|calculates USD total| Money["Total calculation<br/>public/money.js"]
+  Browser -->|rounds price for USD total| Money["Cents rounding helper<br/>public/money.js"]
 
   subgraph Backend["Routes in one Node.js backend · server.mjs"]
     Parse["Order parsing route<br/>POST /api/parse-order"]
@@ -73,7 +73,8 @@ flowchart TD
 
 - `public/` — browser interface, displayed USD total calculation, and PayPal JavaScript SDK button.
 - `server.mjs` — one Node.js backend serving the UI and handling Gemini parsing, PayPal Orders v2 creation/capture, and server-side credentials.
-- `public/money.js` — decimal-to-cents conversion and rounding for the USD total; it does not convert between currencies.
+- `public/app.js` — multiplies quantity by unit price to display the USD total.
+- `public/money.js` — decimal-to-cents conversion and rounding used by the total calculation; it does not multiply amounts or convert between currencies.
 - `tests/` — Playwright smoke tests.
 
 ## Hackathon status
