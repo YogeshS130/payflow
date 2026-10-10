@@ -43,25 +43,28 @@ The smoke tests check the entry page, required input, and missing-AI-key behavio
 flowchart TD
   Seller -->|enters order| Page["Order page<br/>public/index.html"]
   Page -->|hosts workflow| Browser["Browser workflow<br/>public/app.js"]
-  Browser -->|rounds price for USD total| Money["Cents rounding helper<br/>public/money.js"]
 
   subgraph Backend["Routes in one Node.js backend · server.mjs"]
     Parse["Order parsing route<br/>POST /api/parse-order"]
     Config["PayPal config route<br/>GET /api/config"]
     Create["Order creation route<br/>POST /api/orders"]
     Capture["Payment capture route<br/>POST /api/orders/:orderId/capture"]
+    Money["Shared cents helper<br/>public/money.js"]
   end
 
   Browser -->|draft request| Parse
+  Parse -->|validates extracted price| Money
   Parse -->|requests structured draft| Gemini["Gemini API"]
   Gemini -->|draft details| Parse
   Parse -->|reviewable draft| Browser
 
+  Browser -->|rounds unit price for total| Money
   Browser -->|fetches browser client ID| Config
   Config -->|client ID| Browser
   Browser -->|loads and renders| SDK["PayPal JavaScript SDK"]
   SDK -->|seller approves checkout| Browser
   Browser -->|create| Create
+  Create -->|validates checkout price| Money
   Create -->|creates Sandbox order| Orders["PayPal Orders API · Sandbox"]
   Orders -->|order ID| Create
   Create -->|order ID| Browser
@@ -74,7 +77,7 @@ flowchart TD
 - `public/` — browser interface, displayed USD total calculation, and PayPal JavaScript SDK button.
 - `server.mjs` — one Node.js backend serving the UI and handling Gemini parsing, PayPal Orders v2 creation/capture, and server-side credentials.
 - `public/app.js` — multiplies quantity by unit price to display the USD total.
-- `public/money.js` — decimal-to-cents conversion and rounding used by the total calculation; it does not multiply amounts or convert between currencies.
+- `public/money.js` — shared decimal-to-cents conversion and rounding used by the browser total and backend price validation; it does not multiply amounts or convert between currencies.
 - `tests/` — Playwright smoke tests.
 
 ## Hackathon status
