@@ -21,6 +21,12 @@ test('rejects an order when the mocked parser cannot identify a usable price', a
   await expect(page.getByRole('status')).toContainText('I could not safely identify the item, quantity, and unit price');
 });
 
+test('rejects non-string order descriptions without calling Gemini', async ({ request }) => {
+  const response = await request.post('/api/parse-order', { data: { text: 12345 } });
+  expect(response.status()).toBe(400);
+  expect(await response.json()).toEqual({ error: 'Describe the order in 5 to 500 characters.' });
+});
+
 test('retries an overloaded Gemini model once, then falls back to Gemini 2.5 Flash', async ({ request }) => {
   const response = await request.post('/api/parse-order', {
     data: { text: '2 blue mugs at $12 each [fallback test]' }
@@ -34,6 +40,24 @@ test('retries an overloaded Gemini model once, then falls back to Gemini 2.5 Fla
     'gemini-3.8-flash',
     'gemini-2.5-flash'
   ]);
+});
+
+test('validates PayPal order input and capture IDs before calling PayPal', async ({ request }) => {
+  const orderResponse = await request.post('/api/orders', {
+    data: { item: 'mugs', quantity: 0, unitPrice: 12 }
+  });
+  expect(orderResponse.status()).toBe(400);
+  expect(await orderResponse.json()).toEqual({ error: 'Review the item, quantity, and unit price before checkout.' });
+
+  const captureResponse = await request.post('/api/orders/invalid-id!/capture');
+  expect(captureResponse.status()).toBe(400);
+  expect(await captureResponse.json()).toEqual({ error: 'Invalid order ID.' });
+});
+
+test('captures a Sandbox order with the existing response format', async ({ request }) => {
+  const response = await request.post('/api/orders/MOCK-1/capture');
+  expect(response.ok()).toBe(true);
+  expect(await response.json()).toEqual({ status: 'COMPLETED', orderId: 'MOCK-1' });
 });
 
 for (const scenario of [
